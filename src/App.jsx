@@ -6,9 +6,7 @@ import RegisterPage from './components/RegisterPage';
 import AdminDashboard from './components/AdminDashboard';
 import AnnounceResults from './components/AnnounceResults';
 import CreateElection from './components/CreateElection';
-import VoterLogin from './components/VoterLogin';
 import AddVoters from './components/AddVoters';
-import CastVote from './components/CastVote';
 import { Box } from '@mui/material';
 
 function App() {
@@ -31,8 +29,6 @@ function App() {
           <Route path="/announceResults/:electionId" element={<AnnounceResults />} />
           <Route path="/addVoters/:electionId" element={<AddVoters />} />
           <Route path="/createElection" element={<CreateElection />} />
-          <Route path="/voter/login" element={<VoterLogin />} />
-          <Route path="/castVote" element={<CastVote />} />
         </Routes>
       </Router>
     </Box>
