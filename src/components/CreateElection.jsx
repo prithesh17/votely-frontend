@@ -12,7 +12,7 @@ const CreateElection = () => {
   const [endTime, setEndTime] = useState("");
   const [candidates, setCandidates] = useState([{ name: "", party: "" }]);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleCandidateChange = (index, field, value) => {
@@ -28,12 +28,12 @@ const CreateElection = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+    const start = DateTime.fromISO(startTime, { zone: 'local' }).toUTC();
+    const end = DateTime.fromISO(endTime, { zone: 'local' }).toUTC();
 
     if (start >= end) {
       setErrorMessage("Start time must be earlier than end time.");
-      return; 
+      return;
     }
 
     try {
@@ -42,8 +42,8 @@ const CreateElection = () => {
         `${apiUrl}/admin/createElection`,
         {
           electionTitle,
-          startTime,
-          endTime,
+          startTime: start.toISO(), 
+          endTime: end.toISO(),     
           candidates,
         },
         {
@@ -56,7 +56,7 @@ const CreateElection = () => {
       if (response.data.success) {
         setSuccessMessage("Election created successfully!");
         setTimeout(() => {
-          navigate("/admin-dashboard"); 
+          navigate("/admin-dashboard");
         }, 2000);
       }
     } catch (error) {
@@ -89,7 +89,7 @@ const CreateElection = () => {
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
           style={{ marginBottom: "16px" }}
-          InputLabelProps={{ shrink: true }} // Fixes placeholder overlap
+          InputLabelProps={{ shrink: true }} 
         />
         <TextField
           label="End Time"
