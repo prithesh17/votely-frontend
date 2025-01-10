@@ -1,20 +1,35 @@
 import React, { useState } from "react";
-import { Container, Typography, TextField, Button, Grid } from "@mui/material";
+import { 
+  Container, 
+  Typography, 
+  TextField, 
+  Button, 
+  Grid, 
+  Box,
+  Paper,
+  CircularProgress,
+  Alert,
+  Stack
+} from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Papa from "papaparse";
+import { styled } from '@mui/material/styles';
 
-const apiUrl = import.meta.env.VITE_API_URL;  
+const apiUrl = import.meta.env.VITE_API_URL;
 
+const Input = styled('input')({
+  display: 'none',
+});
 
 const AddVoters = () => {
-  const { electionId } = useParams(); 
-  const navigate = useNavigate(); 
-  const [emails, setEmails] = useState([""]); 
+  const { electionId } = useParams();
+  const navigate = useNavigate();
+  const [emails, setEmails] = useState([""]);
   const [message, setMessage] = useState("");
   const [csvFile, setCsvFile] = useState(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (index, event) => {
     const values = [...emails];
@@ -23,40 +38,37 @@ const AddVoters = () => {
   };
 
   const handleAddEmailField = () => {
-    setEmails([...emails, ""]); 
+    setEmails([...emails, ""]);
   };
 
   const handleFileChange = (event) => {
-    setCsvFile(event.target.files[0]); 
+    setCsvFile(event.target.files[0]);
   };
 
   const parseCsv = (file) => {
     Papa.parse(file, {
       complete: (results) => {
-        const extractedEmails = results.data.flat().filter(email => email); 
-        setEmails(extractedEmails); 
-        setMessage(`${extractedEmails.length} email(s) extracted from CSV.`); 
+        const extractedEmails = results.data.flat().filter(email => email);
+        setEmails(extractedEmails);
+        setMessage(`${extractedEmails.length} email(s) extracted from CSV.`);
       },
-      header: false, 
-      skipEmptyLines: true, 
+      header: false,
+      skipEmptyLines: true,
     });
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); 
-
+    event.preventDefault();
     const filteredEmails = emails.filter(email => email.trim() !== "");
-
-    const jwt = Cookies.get("accessToken"); 
-
-    setLoading(true); 
+    const jwt = Cookies.get("accessToken");
+    setLoading(true);
 
     try {
       const response = await axios.post(
         `${apiUrl}/admin/addvoters`,
         {
           electionId,
-          voters: filteredEmails, 
+          voters: filteredEmails,
         },
         {
           headers: {
@@ -67,11 +79,9 @@ const AddVoters = () => {
 
       if (response.data.success) {
         setMessage("Voters added successfully!");
-        setEmails([""]); 
-        setCsvFile(null); 
-
-      
-          navigate("/admin-dashboard");
+        setEmails([""]);
+        setCsvFile(null);
+        navigate("/admin-dashboard");
       } else {
         setMessage("Failed to add voters.");
       }
@@ -79,75 +89,98 @@ const AddVoters = () => {
       console.error("Error adding voters:", error);
       setMessage("Error adding voters.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Add Voters
-      </Typography>
-      {message && <Typography variant="h6">{message}</Typography>}
-      
-      {loading ? (
-        <Typography variant="h6" style={{ color: "blue" }}>
-          Please wait, adding voters...
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+          Add Voters
         </Typography>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          {emails.map((email, index) => (
-            <Grid container spacing={2} key={index} alignItems="center" style={{ marginBottom: "16px" }}>
-              <Grid item xs={12}>
+        
+        {message && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            {message}
+          </Alert>
+        )}
+
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+            <CircularProgress />
+            <Typography variant="h6" color="primary" sx={{ ml: 2 }}>
+              Please wait, adding voters...
+            </Typography>
+          </Box>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={3}>
+              {emails.map((email, index) => (
                 <TextField
+                  key={index}
                   label="Voter Email"
                   variant="outlined"
                   fullWidth
                   value={email}
                   onChange={(event) => handleInputChange(index, event)}
                   required
+                  sx={{ backgroundColor: 'background.paper' }}
                 />
+              ))}
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleAddEmailField}
+                      sx={{ minWidth: '120px' }}
+                    >
+                      Add More
+                    </Button>
+                    
+                    <label htmlFor="csv-file">
+                      <Input
+                        id="csv-file"
+                        type="file"
+                        accept=".csv"
+                        onChange={handleFileChange}
+                      />
+                      <Button variant="outlined" component="span">
+                        Choose CSV
+                      </Button>
+                    </label>
+                    
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => csvFile && parseCsv(csvFile)}
+                      disabled={!csvFile}
+                    >
+                      Upload CSV
+                    </Button>
+                  </Stack>
+                </Grid>
+                
+                <Grid item xs={12} md={4}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    fullWidth
+                    size="large"
+                    sx={{ height: '100%' }}
+                  >
+                    Submit
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
-          ))}
-          <Grid container spacing={2} style={{ marginTop: "16px" }}>
-            <Grid item xs={12} md={8}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddEmailField}
-                style={{ marginRight: "8px" }} 
-              >
-                Add More
-              </Button>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleFileChange}
-                style={{ marginLeft: "8px" }} 
-              />
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => csvFile && parseCsv(csvFile)} 
-                style={{ marginLeft: "8px" }} 
-              >
-                Upload CSV
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Button
-                variant="contained"
-                color="secondary"
-                type="submit"
-                fullWidth 
-              >
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      )}
+            </Stack>
+          </form>
+        )}
+      </Paper>
     </Container>
   );
 };
