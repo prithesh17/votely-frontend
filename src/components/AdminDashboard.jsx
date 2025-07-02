@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { 
-  Button, 
-  Container, 
-  Typography, 
-  Card, 
+import {
+  Button,
+  Container,
+  Typography,
+  Card,
   CardContent,
   Grid,
   Box,
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
         }
       );
       if (response.data.success) {
-        setElections((prevElections) => 
+        setElections((prevElections) =>
           prevElections.filter((election) => election.electionId !== electionId)
         );
       }
@@ -85,27 +85,27 @@ const AdminDashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
-          p: 3, 
-          mb: 4, 
+        sx={{
+          p: 3,
+          mb: 4,
           background: `linear-gradient(45deg, ${theme.palette.primary.main}15, ${theme.palette.primary.light}15)`,
           borderRadius: 2
         }}
       >
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            mb: 2 
+            mb: 2
           }}
         >
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             component="h1"
-            sx={{ 
+            sx={{
               fontWeight: 'bold',
               color: theme.palette.primary.main
             }}
@@ -136,8 +136,8 @@ const AdminDashboard = () => {
       <Grid container spacing={3}>
         {elections.map((election) => (
           <Grid item xs={12} key={election._id}>
-            <Card 
-              sx={{ 
+            <Card
+              sx={{
                 borderRadius: 2,
                 '&:hover': {
                   boxShadow: theme.shadows[4],
@@ -156,10 +156,10 @@ const AdminDashboard = () => {
               <CardContent>
                 <Stack spacing={1}>
                   <Typography color="text.secondary">
-                    <strong>Start Time:</strong> {new Date(election.startTime).toLocaleString()}
+                    <strong>Start Time:</strong> {new Date(election.startTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
                   </Typography>
                   <Typography color="text.secondary">
-                    <strong>End Time:</strong> {new Date(election.endTime).toLocaleString()}
+                    <strong>End Time:</strong> {new Date(election.endTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
                   </Typography>
                 </Stack>
               </CardContent>

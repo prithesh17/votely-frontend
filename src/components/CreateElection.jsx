@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { 
-  Container, 
-  Typography, 
-  TextField, 
-  Button, 
-  Snackbar, 
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Snackbar,
   Box,
   Paper,
   IconButton,
@@ -55,8 +55,9 @@ const CreateElection = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+    // Convert IST string to UTC ISO string
+    const start = new Date(`${startTime}:00+05:30`);
+    const end = new Date(`${endTime}:00+05:30`);
 
     if (start >= end) {
       setErrorMessage("Start time must be earlier than end time.");
@@ -69,8 +70,8 @@ const CreateElection = () => {
         `${apiUrl}/admin/createElection`,
         {
           electionTitle,
-          startTime,
-          endTime,
+          startTime: start.toISOString(), // UTC
+          endTime: end.toISOString(),     // UTC
           candidates,
         },
         {
@@ -92,30 +93,31 @@ const CreateElection = () => {
     }
   };
 
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
-          p: 3, 
-          mb: 4, 
+        sx={{
+          p: 3,
+          mb: 4,
           background: `linear-gradient(45deg, ${theme.palette.primary.main}15, ${theme.palette.primary.light}15)`,
           borderRadius: 2
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <IconButton 
+          <IconButton
             onClick={() => navigate('/admin-dashboard')}
             sx={{ mr: 2 }}
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             component="h1"
-            sx={{ 
+            sx={{
               fontWeight: 'bold',
-              color: theme.palette.primary.main 
+              color: theme.palette.primary.main
             }}
           >
             Create Election
@@ -179,7 +181,7 @@ const CreateElection = () => {
                 variant="outlined"
                 startIcon={<AddCircleOutlineIcon />}
                 onClick={handleAddCandidate}
-                sx={{ 
+                sx={{
                   borderRadius: 2,
                   textTransform: 'none'
                 }}
@@ -190,11 +192,11 @@ const CreateElection = () => {
 
             <Stack spacing={3}>
               {candidates.map((candidate, index) => (
-                <Paper 
-                  key={index} 
+                <Paper
+                  key={index}
                   elevation={0}
-                  sx={{ 
-                    p: 2, 
+                  sx={{
+                    p: 2,
                     background: theme.palette.grey[50],
                     borderRadius: 2
                   }}
@@ -223,8 +225,8 @@ const CreateElection = () => {
                       </Grid>
                     </Grid>
                     {candidates.length > 1 && (
-                      <IconButton 
-                        color="error" 
+                      <IconButton
+                        color="error"
                         onClick={() => handleRemoveCandidate(index)}
                         sx={{ ml: 1 }}
                       >
